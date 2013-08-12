@@ -1,5 +1,6 @@
-#load "WPF.fsx"
+#load "Utils.fsx"
 open WPF
+open Utils
 open FSharpx
 
 module C = Controls
@@ -47,20 +48,7 @@ Window.create -1e3 5e1 8e2 8e2 (fun _ ->
     }
     |> Async.StartImmediate
 
-    C.dockPanel [
-        C.stackPanel [
-            Slider.create 12.0 4.0
-            |>! C.withWidth 1e2
-            |>! Slider.snaps
-            |>! Slider.withTick Slider.Placement.BottomRight
-            |>! Slider.withToolTip Slider.Placement.BottomRight
-            |>! Slider.onChange (fun _ -> adjust)
-            |> C.withLabel "Distance"
-            |>! C.withMargins 3 3 0 3
-        ]
-        |>! C.withBackground (Colors.fromCode 0xECE9D8)
-        |>! C.dock Dock.Left
-
+    let canvas =
         Canvas.create [
             set1
             set2
@@ -72,6 +60,16 @@ Window.create -1e3 5e1 8e2 8e2 (fun _ ->
             c -+ Transform.translate w h
             |> ignore
         )
-    ]
+
+    controlPanel [
+        Slider.create 12.0 4.0
+        |>! C.withWidth 1e2
+        |>! Slider.snaps
+        |>! Slider.withTick Slider.Placement.BottomRight
+        |>! Slider.withToolTip Slider.Placement.BottomRight
+        |>! Slider.onChange (fun _ -> adjust)
+        |> C.withLabel "Distance"
+        |>! C.withMargins 3 3 0 3
+    ] -- canvas
 )
 |> Window.show

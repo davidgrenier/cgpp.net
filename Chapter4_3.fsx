@@ -1,10 +1,11 @@
-#r @"C:\Bib\Projects\ExtCore\ExtCore\bin\Release\ExtCore.dll"
-#load "WPF.fsx"
+#load "Utils.fsx"
 open ExtCore.Collections
 open FSharpx
 open WPF
+open Utils
 
 module C = Controls
+open C.Operators
 
 let window _ =
     let canvas = Canvas.create []
@@ -23,18 +24,13 @@ let window _ =
 
     swap()
     
-    C.dockPanel [
-        C.stackPanel [
-            C.textBlock "Controls"
-            |>! C.withMargins 3 0 3 3
-            C.button "Change"
-            |>! C.withMargins 3 0 3 3
-            |>! Button.onClick swap
-        ] |>! C.dock Dock.Left
-        |>! C.withBackground (Colors.fromCode 0xECE9D8)
-
-        canvas
-    ]
+    controlPanel [
+        C.textBlock "Controls"
+        |>! C.withMargins 3 0 3 3
+        C.button "Change"
+        |>! C.withMargins 3 0 3 3
+        |>! Button.onClick swap
+    ] -- canvas
 
 window
 |> Window.create -1e3 5e1 8e2 4e2

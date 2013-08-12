@@ -1,7 +1,8 @@
-#load "WPF.fsx"
+#load "Utils.fsx"
 open ExtCore.Collections
 open FSharpx
 open WPF
+open Utils
 
 module C = Controls
 open C.Operators
@@ -72,31 +73,24 @@ let slider max ticksAt =
 
 Window.create -1e3 5e1 8e2 8e2 (fun w ->
     let canvas = canvas (candidates())
-    C.dockPanel [
-        C.stackPanel [
-            slider 20.0 2.0
-            |> C.withLabel "CrossDistance"
+    controlPanel [
+        slider 20.0 2.0
+        |> C.withLabel "CrossDistance"
 
-            C.colorPicker Colors.Black (fun c -> C.withBackground c w)
-            |> C.withLabel "Background"
+        C.colorPicker Colors.Black (fun c -> C.withBackground c w)
+        |> C.withLabel "Background"
 
-            C.colorPicker Colors.Navy (fun c ->
-                canvas.Children
-                |> Seq.cast<obj>
-                |> Seq.choose (function
-                    | :? System.Windows.Shapes.Line as line -> Some line
-                    | _ -> None
-                )
-                |> Seq.iter (fun x -> x |> Shapes.withStroke (Brushes.ofColor c))
+        C.colorPicker Colors.Navy (fun c ->
+            canvas.Children
+            |> Seq.cast<obj>
+            |> Seq.choose (function
+                | :? System.Windows.Shapes.Line as line -> Some line
+                | _ -> None
             )
-            |> C.withLabel "GridArray"
-        ]
-        |>! C.dock Dock.Left
-        |>! C.withBackground (Colors.fromCode 0xECE9D8)
-        |>! C.withZIndex 1
-
-        canvas
-    ]
+            |> Seq.iter (fun x -> x |> Shapes.withStroke (Brushes.ofColor c))
+        )
+        |> C.withLabel "GridArray"
+    ] -- canvas
 )
 |>! C.withBackground Colors.Black
 |> Window.show

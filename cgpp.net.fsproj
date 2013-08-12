@@ -33,6 +33,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="WPF.fsx" />
+    <None Include="Utils.fsx" />
     <None Include="Chapter2.fsx" />
     <None Include="Chapter3.fsx" />
     <None Include="Chapter4.fsx" />

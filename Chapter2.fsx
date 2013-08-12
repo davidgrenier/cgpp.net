@@ -1,6 +1,8 @@
 ﻿#load "WPF.fsx"
 open WPF
 
+module C = Controls
+
 open System.Windows.Media
 open Transform.Operators
 
@@ -67,16 +69,16 @@ let accurateClock () =
         (float System.DateTime.Now.Hour * 3e1)
 
 Window.create -1e3 50.0 8e2 8e2 (fun _ ->
-    let clockContent = Controls.content (fastClock())
+    let clockContent = C.content (fastClock())
     let replace content _ = clockContent.Content <- content()
 
-    Controls.stackPanel [
-        Controls.horizontalPanel [
-            Controls.radioButton "Fast" true
-            |>! Controls.withWidth 5e1
+    C.stackPanel [
+        C.horizontalPanel [
+            C.radioButton "Fast" true
+            |>! C.withWidth 5e1
             |>! Button.onClick (replace fastClock)
 
-            Controls.radioButton "Accurate" false
+            C.radioButton "Accurate" false
             |>! Button.onClick (replace accurateClock)
         ]
         clockContent
