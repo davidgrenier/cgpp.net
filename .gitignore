@@ -1,0 +1,11 @@
+*.[Oo]bj
+bin
+obj
+*.suo
+*.user
+*.dll.js
+*.dll.min.js
+build.tmp
+repositories.config
+packages/WebSharper.2.4.85.235/*
+!*.targets
