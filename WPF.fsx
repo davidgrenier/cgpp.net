@@ -5,7 +5,7 @@
 #r "UIAutomationTypes"
 #r @"C:\Bib\Projects\FSharpx\Build\FSharpx.Core.dll"
 #r @"C:\Bib\Projects\ExtCore\ExtCore\bin\Release\ExtCore.dll"
-#r @"C:\Bib\Projects\lib\Xceed.Wpf.Toolkit.dll"
+#r "Xceed.Wpf.Toolkit.dll"
 
 open FSharpx
 
