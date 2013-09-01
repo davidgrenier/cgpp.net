@@ -1,5 +1,7 @@
 ## Computer Graphics: Principles and Practice, 3rd ed
 
+This is a rough implementation of the content I have covered so far in the new edition [CGPP](http://cgpp.net/about.xml).
+
 ### Contact
 
 * Email   : davidgrenier@gmail.com
