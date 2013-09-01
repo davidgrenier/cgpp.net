@@ -7,10 +7,9 @@
 #load "WPF.fs"
 #load "Controls.fs"
 
-#I @"C:\Bib\Projects\"
-#r @"FSharpx\Build\FSharpx.Core.dll"
-#r @"ExtCore\ExtCore\bin\Release\ExtCore.dll"
-#r "Xceed.Wpf.Toolkit.dll"
+#r "lib\FSharpx.Core.dll"
+#r "lib\ExtCore.dll"
+#r "lib\Xceed.Wpf.Toolkit.dll"
 
 module WPFEventLoop =
     open System.Windows

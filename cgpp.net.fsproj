@@ -25,11 +25,14 @@
     </DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="ExtCore">
+      <HintPath>lib\ExtCore.dll</HintPath>
+    </Reference>
     <Reference Include="FSharp.Core, Version=$(TargetFSharpCoreVersion), Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
       <Private>True</Private>
     </Reference>
     <Reference Include="FSharpx.Core">
-      <HintPath>..\fsharpx\build\FSharpx.Core.dll</HintPath>
+      <HintPath>lib\FSharpx.Core.dll</HintPath>
     </Reference>
     <Reference Include="mscorlib" />
     <Reference Include="PresentationCore" />
@@ -41,7 +44,7 @@
     <Reference Include="UIAutomationTypes" />
     <Reference Include="WindowsBase" />
     <Reference Include="Xceed.Wpf.Toolkit">
-      <HintPath>Xceed.Wpf.Toolkit.dll</HintPath>
+      <HintPath>lib\Xceed.Wpf.Toolkit.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
