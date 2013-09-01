@@ -1,9 +1,8 @@
-#load "WPF.fsx"
-open WPF
+#load "Load.fsx"
 
+open Transform.Operators
 module C = Controls
 open C.Operators
-open Transform.Operators
 
 Window.create -1e3 5e1 8e2 8e2 (fun _ ->
     let gray =

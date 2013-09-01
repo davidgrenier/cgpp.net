@@ -1,12 +1,9 @@
-#load "Utils.fsx"
-open WPF
-open Utils
-open FSharpx
+#load "Load.fsx"
 
-module C = Controls
-
-open C.Operators
 open Transform.Operators
+module C = Controls
+open C.Operators
+open FSharpx
 
 type Visibility = System.Windows.Visibility
 
@@ -61,7 +58,7 @@ Window.create -1e3 5e1 8e2 8e2 (fun _ ->
             |> ignore
         )
 
-    controlPanel [
+    C.controlPanel [
         Slider.create 12.0 4.0
         |>! C.withWidth 1e2
         |>! Slider.snaps

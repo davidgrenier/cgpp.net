@@ -1,11 +1,8 @@
-#load "Utils.fsx"
-open ExtCore.Collections
-open FSharpx
-open WPF
-open Utils
+#load "Load.fsx"
 
 module C = Controls
 open C.Operators
+open FSharpx
 
 let window _ =
     let canvas = Canvas.create []
@@ -24,9 +21,7 @@ let window _ =
 
     swap()
     
-    controlPanel [
-        C.textBlock "Controls"
-        |>! C.withMargins 3 0 3 3
+    C.controlPanel [
         C.button "Change"
         |>! C.withMargins 3 0 3 3
         |>! Button.onClick swap

@@ -1,8 +1,6 @@
-#load "WPF.fsx"
-open WPF
+#load "Load.fsx"
 
 module C = Controls
-
 open C.Operators
 
 let menu() =

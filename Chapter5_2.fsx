@@ -1,12 +1,9 @@
-#load "Utils.fsx"
-open ExtCore.Collections
-open FSharpx
-open WPF
-open Utils
+#load "Load.fsx"
 
+open Transform.Operators
 module C = Controls
 open C.Operators
-open Transform.Operators
+open FSharpx
 
 let defaultSpeed = Timespan.secs 14
 
@@ -73,7 +70,7 @@ let slider max ticksAt =
 
 Window.create -1e3 5e1 8e2 8e2 (fun w ->
     let canvas = canvas (candidates())
-    controlPanel [
+    C.controlPanel [
         slider 20.0 2.0
         |> C.withLabel "CrossDistance"
 

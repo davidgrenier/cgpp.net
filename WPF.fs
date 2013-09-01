@@ -1,61 +1,7 @@
-﻿#r "PresentationFramework"
-#r "PresentationCore"
-#r "WindowsBase"
-#r "System.Xaml"
-#r "UIAutomationTypes"
-#r @"C:\Bib\Projects\FSharpx\Build\FSharpx.Core.dll"
-#r @"C:\Bib\Projects\ExtCore\ExtCore\bin\Release\ExtCore.dll"
-#r "Xceed.Wpf.Toolkit.dll"
+﻿[<AutoOpen>]
+module WPF
 
 open FSharpx
-
-[<AutoOpen>]
-module Primitives =
-    let (|>!) e f = f e; e
-
-    [<Measure>]
-    type mm
-
-    [<Measure>]
-    type inch
-
-    let fromInch (distance: float<inch>) = distance * 96.0<inch^-1>
-
-    let fromMili (distance: float<mm>) = distance / 25.4 * 96.0<mm^-1>
-    
-    let pi = System.Math.PI
-
-module WPFEventLoop =
-    open System.Windows
-    open System.Windows.Threading
-    open Microsoft.FSharp.Compiler.Interactive
-
-    type RunDelegate<'b> = delegate of unit -> 'b
-    let create () =
-        let app  =
-            try
-                Application()
-                |>! fun _ -> (Window() |> ignore)
-            with :? System.InvalidOperationException -> Application.Current
-        let disp = app.Dispatcher
-        {
-            new IEventLoop with
-                member x.Run() =
-                    app.Run() |> ignore
-                    false
-
-                member x.Invoke f =
-                    try
-                        disp.Invoke(DispatcherPriority.Send, RunDelegate(f >> box)) |> unbox
-                    with e ->
-                        eprintf "\n\n ERROR: %O\n" e
-                        reraise()
-
-                member x.ScheduleRestart() = ()
-         }
-
-fsi.EventLoop <- WPFEventLoop.create()
-
 open System.Windows
 open System.Windows.Media
 

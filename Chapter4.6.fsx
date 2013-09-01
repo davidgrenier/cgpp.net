@@ -1,10 +1,7 @@
-#r @"C:\Bib\Projects\ExtCore\ExtCore\bin\Release\ExtCore.dll"
-#load "WPF.fsx"
-open ExtCore.Collections
-open FSharpx
-open WPF
+#load "Load.fsx"
 
 module C = Controls
+open FSharpx
 
 let poly () =
     Polygon.create []

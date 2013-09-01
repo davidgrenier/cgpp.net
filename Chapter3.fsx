@@ -1,8 +1,6 @@
-﻿#load "WPF.fsx"
-open WPF
-open Transform.Operators
+﻿#load "Load.fsx"
 
-let pi = System.Math.PI
+open Transform.Operators
 
 module List =
     let rec phold f acc = function

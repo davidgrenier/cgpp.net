@@ -1,5 +1,4 @@
-﻿#load "WPF.fsx"
-open WPF
+﻿#load "Load.fsx"
 
 module C = Controls
 
