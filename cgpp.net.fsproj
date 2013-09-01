@@ -44,6 +44,7 @@
     <None Include="Chapter5_1.fsx" />
     <None Include="Chapter5_2.fsx" />
     <None Include="Chapter5_3.fsx" />
+    <None Include="HilbertCurve.fsx" />
     <None Include="Chapter5_4.fsx" />
   </ItemGroup>
   <PropertyGroup>
