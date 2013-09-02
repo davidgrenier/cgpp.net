@@ -22,7 +22,7 @@ let window _ =
     swap()
     
     C.controlPanel [
-        C.button "Change"
+        Button.create "Change"
         |>! C.withMargins 3 0 3 3
         |>! Button.onClick swap
     ] -- canvas

@@ -233,8 +233,7 @@ module Slider =
             |> sprintf "%g"
             |> Seq.skipWhile (fun x -> x <> '.')
             |> Seq.length
-            |> flip (-) 1
-            |> max 0
+            |> fun x -> max 0 (x - 1)
         T(Maximum = maxLimit, TickFrequency = frequency, AutoToolTipPrecision = tickDigits)
 
     let withToolTip placement (slider: T) =
@@ -246,11 +245,15 @@ module Slider =
         match placement with
         | BottomRight -> slider.TickPlacement <- TickPlacement.BottomRight
 
+    let withMin value (slider: T) = slider.Minimum <- value
+
     let snaps (slider: T) = slider.IsSnapToTickEnabled <- true
 
     let onChange f (slider: RangeBase) =
         slider.ValueChanged
         |> Event.add (fun e -> e.Handled <- true; f e.OldValue e.NewValue)
+
+    let initTo v (slider: T) = slider.Value <- v
 
 module Canvas =
     open Controls.Operators

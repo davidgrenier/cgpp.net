@@ -35,7 +35,7 @@ let window _ =
         Slider.create 1.0 0.01
         |>! C.withWidth 1e2
         |>! Slider.withToolTip Slider.BottomRight
-        |>! fun x -> x.set_Value 0.25
+        |>! Slider.initTo 0.25
 
     let (!) a b = ratio.Value * a + (1.0 - ratio.Value) * b
     let smooth ((x1, y1), (x2, y2)) = !x1 x2, !y1 y2
@@ -93,11 +93,11 @@ let window _ =
             scrambleSelect
             castleSelect
 
-            C.button "Clear"
+            Button.create "Clear"
             |>! Button.onClick clearPoints
-            C.button "Subdivide"
+            Button.create "Subdivide"
             |>! Button.onClick subdivide
-            C.button "Dualize"
+            Button.create "Dualize"
             |>! Button.onClick dualize
         ]
         |>! C.dock Dock.Left

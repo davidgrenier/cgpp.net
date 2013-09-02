@@ -33,11 +33,11 @@ let controls moveDiamond =
 
         C.horizontalPanel [
             C.stackPanel [
-                C.button "Next "
+                Button.create "Next "
                 |>! Button.onClick b1click
                 |>! C.withMargins 3 0 3 3
 
-                C.button "Do it "
+                Button.create "Do it "
                 |>! Button.onClick b2click
                 |>! C.withMargins 3 0 3 3
             ]

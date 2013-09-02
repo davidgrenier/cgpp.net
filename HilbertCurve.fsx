@@ -7,20 +7,24 @@ open FSharpx
 Window.create -1e3 5e1 8e2 8e2 (fun _ ->
     C.dockPanel [
         C.controlPanel [
-            Slider.create 8.0 1.0
+            Slider.create 5.0 1.0
             |>! Slider.withToolTip Slider.BottomRight
+            |>! Slider.withTick Slider.BottomRight
+            |>! Slider.snaps
+            |>! Slider.withMin 1.0
             |>! C.withWidth 1e2
             |> C.withLabel "Depth"
 
             Slider.create 25.0 1.0
             |>! Slider.withToolTip Slider.BottomRight
             |>! C.withWidth 1e2
+            |>! Slider.initTo 1e1
             |> C.withLabel "Smoothing"
 
             Button.create "Smooth"
             |>! Button.onClick (fun () -> ())
         ]
-
+        
         Canvas.create []
     ]
 )
@@ -44,7 +48,7 @@ let point n d =
 
 let points n = Seq.init (n * n) (point n)
 
-points 2
+points 1
 points 3
 |> Seq.toArray
 points 9
