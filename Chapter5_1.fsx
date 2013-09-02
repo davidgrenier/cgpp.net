@@ -25,7 +25,7 @@ Window.create -1e3 5e1 8e2 8e2 (fun _ ->
 
     C.dockPanel [
         C.stackPanel [
-            Slider.create 15.0 1.0
+            Slider.create 0.0 1.0 15.0
             |>! fun x -> x.Value <- 11.0
             |>! C.withWidth 1e2
             |>! Slider.onChange (fun _ n ->

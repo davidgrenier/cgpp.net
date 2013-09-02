@@ -62,7 +62,7 @@ let canvas candidates =
     )
 
 let slider max ticksAt =
-    Slider.create max ticksAt
+    Slider.create 0.0 ticksAt max
     |>! C.withWidth 1e2
     |>! Slider.snaps
     |>! Slider.withToolTip Slider.BottomRight

@@ -20,7 +20,7 @@ let controls moveDiamond =
     let happyfy (_: float) n = moveDiamond (fun i x y -> if i % 2 = 1 then x, n else x, y)
 
     let slider() =
-        Slider.create 2e1 2.0
+        Slider.create 0.0 2.0 2e1
         |>! C.withWidth 1e2
         |>! Slider.snaps
         |>! Slider.withToolTip Slider.BottomRight

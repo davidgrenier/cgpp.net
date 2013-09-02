@@ -59,7 +59,7 @@ Window.create -1e3 5e1 8e2 8e2 (fun _ ->
         )
 
     C.controlPanel [
-        Slider.create 12.0 4.0
+        Slider.create 0.0 4.0 12.0
         |>! C.withWidth 1e2
         |>! Slider.snaps
         |>! Slider.withTick Slider.Placement.BottomRight

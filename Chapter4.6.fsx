@@ -24,7 +24,7 @@ let window _ =
         smoothed.Points.Clear()
 
     let dualize () =
-        let points = Polygon.points poly
+        let points = Polygon.points poly |> Seq.toList
         points.Tail @ [points.Head]
         |> Seq.zip points
         |> Seq.map (fun (p, next) -> p.X / 2.0 + next.X / 2.0, p.Y / 2.0 + next.Y / 2.0)
@@ -32,7 +32,7 @@ let window _ =
         |> poly.set_Points
 
     let ratio =
-        Slider.create 1.0 0.01
+        Slider.create 0.0 0.01 1.0
         |>! C.withWidth 1e2
         |>! Slider.withToolTip Slider.BottomRight
         |>! Slider.initTo 0.25
@@ -48,6 +48,7 @@ let window _ =
             | true -> poly
             | _ -> target
             |> Polygon.points
+            |> Seq.toList
 
         match pointsOrDefault smoothed with
         | [] | [_] -> failwith "Cannot subdivide when there are no points."

@@ -68,7 +68,7 @@ module Shapes =
 
     let ellipse width = ellipseGeometry width >> path
     let circle size = ellipse size size
-    
+
 //    let rectangleGeometry width height = RectangleGeometry(Rect(0.0, 0.0, width, height))
 //    let rectangle width height = Rectangle(Width = width, Height = height)
 //    let square size = rectangle size size
@@ -227,14 +227,14 @@ module Slider =
     type Placement =
         | BottomRight
 
-    let create maxLimit frequency =
+    let create min increment maxLimit =
         let tickDigits =
-            frequency
+            increment
             |> sprintf "%g"
             |> Seq.skipWhile (fun x -> x <> '.')
             |> Seq.length
             |> fun x -> max 0 (x - 1)
-        T(Maximum = maxLimit, TickFrequency = frequency, AutoToolTipPrecision = tickDigits)
+        T(Maximum = maxLimit, TickFrequency = increment, AutoToolTipPrecision = tickDigits, Minimum = min)
 
     let withToolTip placement (slider: T) =
         match placement with
@@ -244,8 +244,6 @@ module Slider =
     let withTick placement (slider: T) =
         match placement with
         | BottomRight -> slider.TickPlacement <- TickPlacement.BottomRight
-
-    let withMin value (slider: T) = slider.Minimum <- value
 
     let snaps (slider: T) = slider.IsSnapToTickEnabled <- true
 
@@ -272,12 +270,15 @@ module Canvas =
 
 module Polygon =
     open System.Windows.Shapes
-
+    
     type T = Polygon
+    
+    let inline getPoints arg = (^a : (member Points: PointCollection) arg)
 
-    let points (p: T) = p.Points |> Seq.cast<Points.T> |> Seq.toList
+    let inline points p = getPoints p |> Seq.cast<Points.T>
 
     let create points = T(Points = Shapes.pointCollection points)
+    let createOpen points = Polyline(Points = Shapes.pointCollection points)
 
     let arrow (x1, y1) (x2, y2) brush =
         let heel theta = x2 + 5.0 * cos theta, y2 + 5.0 * sin theta
