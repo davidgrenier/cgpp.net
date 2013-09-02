@@ -144,8 +144,7 @@ module Controls =
 
     let dockPanel (content: Elements.T list) = DockPanel() -< content
 
-    let withLastChildFill (d: DockPanel) =
-        d.LastChildFill <- true
+    let withLastChildFill (d: DockPanel) = d.LastChildFill <- true
 
     let menu content =
         Menu()
@@ -154,8 +153,6 @@ module Controls =
     let menuItem label content =
         MenuItem(Header = label)
         |>! addItems content
-
-    let button label = Button(Content = label)
     
     let align align (e: Elements.F) =
         e.HorizontalAlignment <- align
@@ -176,9 +173,9 @@ module Controls =
         e.Margin <- System.Windows.Thickness(e.Margin.Left, float size, e.Margin.Right, e.Margin.Bottom)
 
     let withLabel text control =
-        horizontalPanel [
+        dockPanel [
             Label(Content = text)
-            control
+            control |>! align HorizontalAlignment.Right
         ]
     
     let withZIndex z e = System.Windows.Controls.Panel.SetZIndex(e, z)
@@ -190,7 +187,10 @@ module Controls =
             |> Event.add (fun x -> f x.NewValue)
 
 module Button =
+    open System.Windows.Controls
     open System.Windows.Controls.Primitives
+
+    let create label = Button(Content = label)
     
     let onClick f (b: ButtonBase) = b.Click |> Event.add (ignore >> f)
 

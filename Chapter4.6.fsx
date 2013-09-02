@@ -1,6 +1,7 @@
 #load "Load.fsx"
 
 module C = Controls
+open C.Operators
 open FSharpx
 
 let poly () =
@@ -85,9 +86,7 @@ let window _ =
         ]
         |>! C.dock Dock.Top
 
-        controls [
-            C.textBlock "Controls"
-
+        C.controlPanel [
             ratio
 
             smoothSelect

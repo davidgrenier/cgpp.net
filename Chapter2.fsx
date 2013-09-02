@@ -5,9 +5,6 @@ module C = Controls
 open System.Windows.Media
 open Transform.Operators
 
-let withMargin element =
-    element
-
 let handPoints =
     [
         -0.015, 0.05
@@ -38,22 +35,22 @@ let getClock s m h secAngle minAngle hrsAngle =
         |>! Shapes.withFill Brushes.Black
 
         Polygon.create handPoints
-        -+ margin
         -+ Transform.scale 0.3 1.1
         -+ Transform.rotate secAngle
         -+ Animations.fullRevoOver (Timespan.secs s)
+        -+ margin
         |>! Shapes.withFill Brushes.Red
 
         fancyHand ()
-        -+ margin
         -+ Transform.rotate minAngle
         -+ Animations.fullRevoOver (Timespan.mins m)
+        -+ margin
 
         fancyHand ()
-        -+ margin
         -+ Transform.scale 1.7 0.7
         -+ Transform.rotate hrsAngle
         -+ Animations.fullRevoOver (Timespan.hrs h)
+        -+ margin
     ]
     -+ Transform.scale (fromInch 3.0<inch>) (fromInch 3.0<inch>)
     -+ Transform.translate (fromInch 1.5<inch>) (fromInch 1.5<inch>)

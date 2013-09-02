@@ -1,11 +1,10 @@
 ﻿module Controls
 
-module C = Controls
-
-open C.Operators
 open Transform.Operators
+module C = Controls
+open C.Operators
 
-let controlPanel content =
+let controlPanel (content: Elements.T list) =
     C.dockPanel [
         C.stackPanel [
             C.textBlock "Controls"
