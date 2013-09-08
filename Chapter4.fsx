@@ -54,8 +54,9 @@ Window.create -1e3 5e1 8e2 8e2 (fun _ ->
             ]
         
             Graph.create [
-                skewer
-                |> Piglets.map (fun (x, y) ->
+                x
+                |> Stream.zip y
+                |> Stream.map (fun (x, y) ->
                     [
                         x, 10.0
                         10.0, y
@@ -63,7 +64,7 @@ Window.create -1e3 5e1 8e2 8e2 (fun _ ->
                         -10.0, y
                     ]
                 )
-                |> Render Controls.polygon
+                |> Shapes.polygon
                 |>! Shapes.withStroke Brushes.Black
                 |>! Shapes.withFill Brushes.LightSeaGreen
             

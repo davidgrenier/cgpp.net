@@ -1,46 +1,38 @@
 ﻿module Piglets
 
 open FSharpx
+open System.Reactive.Linq
+open System.Reactive.Subjects
 
-type Reader<'a> =
-    abstract Current: 'a
-    abstract Add: ('a -> unit) -> unit
+type Reader<'a> = System.IObservable<'a>
+type Writer<'a> = System.IObserver<'a>
+type Stream<'a> = ISubject<'a>
 
-type Writer<'a> =
-    abstract Write: 'a -> unit
+type System.IObserver<'a> with
+    member x.Write v = x.OnNext v
 
-type Stream<'a> =
-    inherit Reader<'a>
-    inherit Writer<'a>
+type System.IObservable<'a> with
+    member x.Current =
+        x.MostRecent Unchecked.defaultof<_>
+        |> Seq.head
+
+module Stream =
+    let create x = new BehaviorSubject<_>(x)
+
+    let map f (stream: Stream<_>) =
+        create Unchecked.defaultof<_>
+        |>! fun s -> stream.Add (f >> s.Write)
+
+    let zip (reader2: Reader<_>) (reader1: Reader<_>) =
+        create Unchecked.defaultof<_>
+        |>! fun s ->
+            reader1.CombineLatest(reader2, fun x y -> x, y).Add s.Write
 
 type Piglet<'a, 'v> =
     {
         Stream: Stream<'a>
         ViewBuilder: 'v
     }
-
-module Stream =
-    let create x =
-        let evt = Event<_>()
-        let readers = evt.Publish
-        let current = ref x
-        {
-            new Stream<'a>
-                interface Reader<'a> with
-                    member __.Current = !current
-                    member __.Add f = readers.Add f
-                interface Writer<'a> with
-                    member __.Write x = evt.Trigger x
-        }
-
-    let map f (stream: Stream<_>) =
-        create (f stream.Current)
-        |>! fun s -> stream.Add (f >> s.Write)
-
-//    let join (stream: Stream<Stream<_>>) =
-//        let s = create stream.Current.Current
-//        let current = ref stream.Current
-//        stream.Add(fun newStream -> current := newStream; 
 
 let Return x =
     {
@@ -69,7 +61,7 @@ let (<*>) pig1 pig2 =
 let Render f piglet = piglet.ViewBuilder f
 
 let Run f piglet =
-    piglet.Stream.Add f
+    (piglet.Stream.Skip 1).Add f
     piglet
 
 let map f pig =
@@ -80,46 +72,48 @@ let map f pig =
     }
 
 module Controls =
+    open System.Windows.Controls
+
     module C = Controls
 
     let input (stream: Stream<_>) =
-        C.textBox stream.Current
+        TextBox()
         |>! fun tb ->
             stream.Add tb.set_Text
             tb.TextChanged.Add(fun _ -> stream.Write tb.Text)
 
-    let textBlock (reader: Reader<_>) =
-        C.textBlock reader.Current
-        |>! fun tb ->
-            reader.Add tb.set_Text
-
-    let label (reader: Reader<_>) =
-        C.label reader.Current
-        |>! fun lbl ->
-            reader.Add lbl.set_Content
-
     let radio text (stream: Stream<_>) =
-        C.radioButton text stream.Current
+        RadioButton(Content = text)
         |>! fun rb ->
+            stream.Add (fun isChecked -> rb.IsChecked <- System.Nullable isChecked)
             rb.Checked.Add(fun _ -> stream.Write true)
             rb.Unchecked.Add(fun _ -> stream.Write false)
-
-    let placeHolder (stream: Stream<_>) =
-        C.content stream.Current
-        |>! fun content ->
-            stream.Add content.set_Content
 
     let slider min increment max (stream: Stream<_>) =
         Slider.create min increment max
         |>! fun slider ->
             slider.Value <- stream.Current
-            slider |> Slider.onChange (konst stream.Write)
+            slider.ValueChanged.Add (fun e -> stream.Write e.NewValue)
 
-    let polygon (stream: Stream<_>) =
-        Polygon.create stream.Current
-        |>! fun p ->
-            stream.Add (Shapes.pointCollection >> p.set_Points)
-
-    let button text (stream: Stream<_>) =
+    let button text (writer: Writer<_>) =
         Button.create text
-        |>! Button.onClick stream.Write
+        |>! Button.onClick writer.Write
+
+    let placeHolder (reader: Reader<_>) =
+        ContentControl()
+        |>! fun content -> reader.Add content.set_Content
+
+    let textBlock (reader: Reader<_>) =
+        TextBlock()
+        |>! fun tb -> reader.Add tb.set_Text
+
+    let label (reader: Reader<_>) =
+        Label()
+        |>! fun lbl -> reader.Add lbl.set_Content
+
+module Shapes =
+    open System.Windows.Shapes
+
+    let polygon (reader: Reader<_>) =
+        Polygon()
+        |>! fun p -> reader.Add (Shapes.pointCollection >> p.set_Points)

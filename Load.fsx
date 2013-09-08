@@ -3,14 +3,21 @@
 #r "WindowsBase"
 #r "System.Xaml"
 #r "UIAutomationTypes"
-#load "Primitives.fs"
-#load "WPF.fs"
-#load "Controls.fs"
-#load "Piglets.fs"
+#r "System.Runtime"
 
 #I @"C:\Bib\Projects\cgpp.net\packages\"
 #r @"FSharpx.Core.1.8.38\lib\40\FSharpx.Core.dll"
 #r @"Extended.Wpf.Toolkit.2.0.0\lib\net40\Xceed.Wpf.Toolkit.dll"
+#r @"Rx-Interfaces.2.1.30214.0\lib\Net45\System.Reactive.Interfaces.dll"
+#r @"Rx-Core.2.1.30214.0\lib\Net45\System.Reactive.Core.dll"
+#r @"Rx-PlatformServices.2.1.30214.0\lib\Net45\System.Reactive.PlatformServices.dll"
+#r @"Rx-Linq.2.1.30214.0\lib\Net45\System.Reactive.Linq.dll"
+#r @"Rx-XAML.2.1.30214.0\lib\Net45\System.Reactive.Windows.Threading.dll"
+
+#load "Primitives.fs"
+#load "WPF.fs"
+#load "Controls.fs"
+#load "Piglets.fs"
 
 module WPFEventLoop =
     open System.Windows
