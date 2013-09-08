@@ -13,6 +13,8 @@
     <Name>cgpp.net</Name>
     <TargetFSharpCoreVersion>4.3.1.0</TargetFSharpCoreVersion>
     <TargetFrameworkProfile />
+    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">.\</SolutionDir>
+    <RestorePackages>true</RestorePackages>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -25,14 +27,12 @@
     </DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="ExtCore">
-      <HintPath>lib\ExtCore.dll</HintPath>
-    </Reference>
     <Reference Include="FSharp.Core, Version=$(TargetFSharpCoreVersion), Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
       <Private>True</Private>
     </Reference>
     <Reference Include="FSharpx.Core">
-      <HintPath>lib\FSharpx.Core.dll</HintPath>
+      <HintPath>packages\FSharpx.Core.1.8.38\lib\40\FSharpx.Core.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="mscorlib" />
     <Reference Include="PresentationCore" />
@@ -44,13 +44,15 @@
     <Reference Include="UIAutomationTypes" />
     <Reference Include="WindowsBase" />
     <Reference Include="Xceed.Wpf.Toolkit">
-      <HintPath>lib\Xceed.Wpf.Toolkit.dll</HintPath>
+      <HintPath>packages\Extended.Wpf.Toolkit.2.0.0\lib\net40\Xceed.Wpf.Toolkit.dll</HintPath>
+      <Private>True</Private>
     </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Primitives.fs" />
     <Compile Include="WPF.fs" />
     <Compile Include="Controls.fs" />
+    <Compile Include="Piglets.fs" />
     <None Include="Load.fsx" />
     <None Include="Chapter2.fsx" />
     <None Include="Chapter3.fsx" />
@@ -62,6 +64,7 @@
     <None Include="Chapter5_3.fsx" />
     <None Include="HilbertCurve.fsx" />
     <None Include="Chapter5_4.fsx" />
+    <None Include="packages.config" />
   </ItemGroup>
   <PropertyGroup>
     <MinimumVisualStudioVersion Condition="'$(MinimumVisualStudioVersion)' == ''">11</MinimumVisualStudioVersion>
@@ -79,6 +82,7 @@
     </Otherwise>
   </Choose>
   <Import Project="$(FSharpTargetsPath)" />
+  <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

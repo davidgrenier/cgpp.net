@@ -2,97 +2,76 @@
 
 module C = Controls
 open C.Operators
+open Piglets
 
-let menu() =
-    C.menu [
-        C.menuItem "File" [
-            C.menuItem "New" []
-            C.menuItem "Open" []
-        ]
-        C.menuItem "Edit" []
-    ]
-    |>! C.dock Dock.Top
+let margin x = C.withMargins 3 0 3 3 x
 
-let controls moveDiamond =
-    let b1click() = printfn "test"
-    let b2click() = ()
-    let fishify (_: float) n = moveDiamond (fun i x y -> if i % 2 = 0 then n, y else x, y)
-    let happyfy (_: float) n = moveDiamond (fun i x y -> if i % 2 = 1 then x, n else x, y)
+Window.create -1e3 5e1 8e2 8e2 (fun _ ->
+    let skewer =
+        Return (fun x y -> x, y)
+        <*> Yield 0.0
+        <*> Yield 0.0
 
-    let slider() =
-        Slider.create 0.0 2.0 2e1
+    let slider stream =
+        Controls.slider 0.0 2.0 2e1 stream
         |>! C.withWidth 1e2
         |>! Slider.snaps
         |>! Slider.withToolTip Slider.BottomRight
         |>! Slider.withTick Slider.BottomRight
-        |>! C.withMargins 3 0 3 3
+        |>! margin
 
-    C.stackPanel [
-        C.textBlock "Controls"
-        |>! C.withMargins 3 0 3 3
-
-        C.horizontalPanel [
-            C.stackPanel [
-                Button.create "Next "
-                |>! Button.onClick b1click
-                |>! C.withMargins 3 0 3 3
-
-                Button.create "Do it "
-                |>! Button.onClick b2click
-                |>! C.withMargins 3 0 3 3
+    skewer
+    |> Render (fun x y ->
+        C.dockPanel [
+            C.menu [
+                C.menuItem "File" [
+                    C.menuItem "New" []
+                    C.menuItem "Open" []
+                ]
+                C.menuItem "Edit" []
             ]
+            |>! C.dock Dock.Top
+        
+            C.controlPanel [
+                C.horizontalPanel [
+                    C.stackPanel [
+                        Yield ()
+                        |> Run (fun _ -> printfn "test")
+                        |> Render (Controls.button "Next ")
+                        |>! margin
 
-            C.stackPanel [
-                slider()
-                |>! Slider.onChange fishify
+                        Yield ()
+                        |> Run (fun _ -> System.Windows.MessageBox.Show "Clicked" |> ignore)
+                        |> Render (Controls.button "Do it ")
+                        |>! margin
+                    ]
 
-                slider()
-                |>! Slider.onChange happyfy
+                    C.stackPanel [
+                        slider x
+                        slider y
+                    ]
+                ]
             ]
-        ]
-    ]
-    |>! C.dock Dock.Left
-    |>! C.withBackground (Colors.fromCode 0xECE9D8)
-
-let graph() =
-    let diamond =
-        Polygon.create [
-            0.0, 1e1
-            1e1, 0.0
-            0.0, -1e1
-            -1e1, 0.0
-        ]
-        |>! Shapes.withStroke Brushes.Black
-        |>! Shapes.withFill Brushes.LightSeaGreen
-
-    let moveDiamond f =
-        diamond.Points.Clone()
-        |> Seq.cast<Point>
-        |> Seq.mapi (fun i p -> f i p.X p.Y)
-        |> Shapes.pointCollection
-        |> fun points -> diamond.Points <- points
-
-    let graph =
-        Graph.create [
-            diamond
+        
+            Graph.create [
+                skewer
+                |> Piglets.map (fun (x, y) ->
+                    [
+                        x, 10.0
+                        10.0, y
+                        x, -10.0
+                        -10.0, y
+                    ]
+                )
+                |> Render Controls.polygon
+                |>! Shapes.withStroke Brushes.Black
+                |>! Shapes.withFill Brushes.LightSeaGreen
             
-            Shapes.dot 1.5 Brushes.LightPink
-            |>! Animations.backAndForth (-4e1, 6e1) (0.0, 0.0) (Timespan.secs 3)
+                Shapes.dot 1.5 Brushes.LightPink
+                |>! Animations.backAndForth (-4e1, 6e1) (0.0, 0.0) (Timespan.secs 3)
+            ]
+            |>! Graph.withAxes
         ]
-        |>! Graph.withAxes
-
-    graph, moveDiamond
-
-let panel _ =
-    let graph, moveDiamond = graph()
-
-    C.dockPanel [
-        menu()
-        controls moveDiamond
-        graph
-    ]
-    |>! Controls.withLastChildFill
-
-panel
-|> Window.create -1e3 5e1 8e2 8e2
+    )
+)
 |> Window.show

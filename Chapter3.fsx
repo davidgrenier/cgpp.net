@@ -76,7 +76,7 @@ let vertexCircle (x, y) =
 let drawModel f =
     let points, edges = f()
 
-    fun _ ->
+    Window.create -1e3 5e1 8e2 8e2 (fun _ ->
         Canvas.create [
             for p, q in edges ->
                 (mapPoint p, mapPoint q)
@@ -87,7 +87,7 @@ let drawModel f =
             for p in points ->
                 vertexCircle(mapPoint p)
         ]
-    |> Window.create -1e3 5e1 8e2 8e2
+    )
     |> Window.show
 
 drawModel (fun () ->

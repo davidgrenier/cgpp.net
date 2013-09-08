@@ -6,10 +6,11 @@
 #load "Primitives.fs"
 #load "WPF.fs"
 #load "Controls.fs"
+#load "Piglets.fs"
 
-#r "lib\FSharpx.Core.dll"
-#r "lib\ExtCore.dll"
-#r "lib\Xceed.Wpf.Toolkit.dll"
+#I @"C:\Bib\Projects\cgpp.net\packages\"
+#r @"FSharpx.Core.1.8.38\lib\40\FSharpx.Core.dll"
+#r @"Extended.Wpf.Toolkit.2.0.0\lib\net40\Xceed.Wpf.Toolkit.dll"
 
 module WPFEventLoop =
     open System.Windows

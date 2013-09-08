@@ -144,8 +144,6 @@ module Controls =
 
     let dockPanel (content: Elements.T list) = DockPanel() -< content
 
-    let withLastChildFill (d: DockPanel) = d.LastChildFill <- true
-
     let menu content =
         Menu()
         |>! addItems content
@@ -160,8 +158,8 @@ module Controls =
     let dock dock control =
         DockPanel.SetDock(control, dock)
         
-    let textBlock text =
-        TextBlock(Text = text)
+    let textBlock text = TextBlock(Text = text)
+    let textBox text = TextBox(Text = text)
 
     let withMargins left top right bottom (e: Elements.F) =
         e.Margin <- System.Windows.Thickness(float left, float top, float right, float bottom)
@@ -172,9 +170,11 @@ module Controls =
     let withTopMargin size (e: Elements.F) =
         e.Margin <- System.Windows.Thickness(e.Margin.Left, float size, e.Margin.Right, e.Margin.Bottom)
 
+    let label text = Label(Content = text)
+
     let withLabel text control =
         dockPanel [
-            Label(Content = text)
+            label text
             control |>! align HorizontalAlignment.Right
         ]
     
@@ -273,9 +273,7 @@ module Polygon =
     
     type T = Polygon
     
-    let inline getPoints arg = (^a : (member Points: PointCollection) arg)
-
-    let inline points p = getPoints p |> Seq.cast<Points.T>
+    let inline points p = (^a : (member Points: PointCollection) p)  |> Seq.cast<Points.T>
 
     let create points = T(Points = Shapes.pointCollection points)
     let createOpen points = Polyline(Points = Shapes.pointCollection points)

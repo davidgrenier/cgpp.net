@@ -1,5 +1,6 @@
 ﻿#load "Load.fsx"
 
+open Piglets
 module C = Controls
 
 open System.Windows.Media
@@ -65,19 +66,21 @@ let accurateClock () =
         (float System.DateTime.Now.Hour * 3e1)
 
 Window.create -1e3 50.0 8e2 8e2 (fun _ ->
-    let clockContent = C.content (fastClock())
-    let replace content _ = clockContent.Content <- content()
+    Yield true
+    |> Render (fun kind ->
+        C.stackPanel [
+            C.horizontalPanel [
+                C.radio "Fast" kind
 
-    C.stackPanel [
-        C.horizontalPanel [
-            C.radioButton "Fast" true
-            |>! C.withWidth 5e1
-            |>! Button.onClick (replace fastClock)
+                kind
+                |> Stream.map not
+                |> C.radio "Accurate"
+            ]
 
-            C.radioButton "Accurate" false
-            |>! Button.onClick (replace accurateClock)
+            kind
+            |> Stream.map (function true -> fastClock() | _ -> accurateClock())
+            |> C.placeHolder
         ]
-        clockContent
-    ]
+    )
 )
 |> Window.show
