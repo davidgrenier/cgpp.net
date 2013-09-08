@@ -9,8 +9,9 @@ This is a rough implementation of the content I have covered so far in the new e
 
 ### Attributions
 
-Includes dependencies on the following librairies.
+Dependencies through NuGet package restore on the following libraries:
 
-* [ExtCore](https://github.com/jack-pappas/ExtCore)
 * [FSharpx](https://github.com/fsharp/fsharpx)
 * [Xceed WPF Toolkit](http://wpftoolkit.codeplex.com/)
+
+* Attempt at [IntelliFactory's Piglets](http://www.cs.ru.nl/P.Achten/IFL2013/symposium_proceedings_IFL2013/ifl2013_submission_29.pdf)
