@@ -15,6 +15,7 @@
 #r @"Rx-XAML.2.1.30214.0\lib\Net45\System.Reactive.Windows.Threading.dll"
 
 #load "Primitives.fs"
+#load "Collections.fs"
 #load "WPF.fs"
 #load "Controls.fs"
 #load "Piglets.fs"

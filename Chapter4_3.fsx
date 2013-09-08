@@ -2,31 +2,34 @@
 
 module C = Controls
 open C.Operators
-open FSharpx
+open Piglets
 
-let window _ =
-    let canvas = Canvas.create []
-    let swap =
-        let caroussel =
-            ref [
-                @"http://planetquest.jpl.nasa.gov/system/news_items/images/39/medium/PIA15257.jpg"
-                @"http://www.jpl.nasa.gov/images/kepler/20111205/kepler20111205-640.jpg"
-                @"http://www.jpl.nasa.gov/images/kepler/20130717/pia17250-640.jpg"
-                @"http://www.nasa.gov/images/content/502973main_exoplanet20101201-43_946-710.jpg"
-            ]
-        fun () ->
-            let source = System.Windows.Media.Imaging.BitmapImage(uriSource = System.Uri caroussel.Value.Head )
-            canvas |> Controls.withImage source
-            caroussel := caroussel.Value.Tail @ [caroussel.Value.Head]
+let caroussel =
+    [
+        "http://www.nasa.gov/images/content/324230main_image_1320_946-710.jpg"
+        "http://www.nasa.gov/centers/jpl/images/content/230983main_exoplanet-browse.jpg"
+        "http://www.nasa.gov/centers/jpl/images/content/215981main_exoplanet-20080227-browse.jpg"
+        "http://www.nasa.gov/images/content/502973main_exoplanet20101201-43_946-710.jpg"
+        "http://www.nasa.gov/images/content/669051main_pia15808-43_946-710.jpg"
+        "http://www.nasa.gov/images/content/672454main_47s_kepler_4_full.jpg"
+    ]
+    |> Seq.map (fun x -> System.Windows.Media.Imaging.BitmapImage(System.Uri x))
+    |> Seq.repeat
 
-    swap()
-    
-    C.controlPanel [
-        Button.create "Change"
-        |>! C.withMargins 3 0 3 3
-        |>! Button.onClick swap
-    ] -- canvas
+Window.create -1e3 5e1 8e2 6e2 (fun _ ->
+    Yield 0
+    |> Render (fun index ->
+        let image =
+            index
+            |> Reader.zipWithSeq caroussel
+            |> Reader.map snd
+            |> Controls.image
 
-window
-|> Window.create -1e3 5e1 8e2 4e2
+        C.controlPanel [
+            Controls.button "Change" index
+            |>! C.withMargins 3 0 3 3
+        ] -- image
+    )
+)
+|>! C.withBackground Colors.Black
 |> Window.show

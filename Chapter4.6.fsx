@@ -9,20 +9,6 @@ let poly () =
     |>! Shapes.withStroke Brushes.Black
     |>! Shapes.withMiterLimit
 
-module List =
-    let rec last = function
-        | [] -> failwith "Empty list"
-        | [x] -> x
-        | _::xs -> last xs
-
-    let dropLast xs =
-        (xs, (false, []))
-        ||> List.foldBack (fun v -> function
-            | false, acc -> true, acc
-            | _, acc -> true, v :: acc
-        )
-        |> snd
-
 let window _ =
     let smoothed =
         poly()

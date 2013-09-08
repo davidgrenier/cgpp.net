@@ -70,6 +70,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Primitives.fs" />
+    <Compile Include="Collections.fs" />
     <Compile Include="WPF.fs" />
     <Compile Include="Controls.fs" />
     <Compile Include="Piglets.fs" />

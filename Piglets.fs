@@ -16,6 +16,10 @@ type System.IObservable<'a> with
         x.MostRecent Unchecked.defaultof<_>
         |> Seq.head
 
+module Reader =
+    let map f (reader: Reader<_>) = Observable.map f reader
+    let zipWithSeq (xs: _ seq) (reader: Reader<_>) = Observable.Zip(reader, xs, fun a b -> a, b)
+
 module Stream =
     let create x = new BehaviorSubject<_>(x)
 
@@ -23,10 +27,12 @@ module Stream =
         create Unchecked.defaultof<_>
         |>! fun s -> stream.Add (f >> s.Write)
 
-    let zip (reader2: Reader<_>) (reader1: Reader<_>) =
+    let zip (reader2: Reader<_>) (reader1: Reader<_>) = reader1.Zip(reader2, fun a b -> a, b)
+
+    let zipLatest (reader2: Reader<_>) (reader1: Reader<_>) =
         create Unchecked.defaultof<_>
         |>! fun s ->
-            reader1.CombineLatest(reader2, fun x y -> x, y).Add s.Write
+            reader1.CombineLatest(reader2, fun a b -> a, b).Add s.Write
 
 type Piglet<'a, 'v> =
     {
@@ -95,9 +101,13 @@ module Controls =
             slider.Value <- stream.Current
             slider.ValueChanged.Add (fun e -> stream.Write e.NewValue)
 
-    let button text (writer: Writer<_>) =
+    let button text (stream: Stream<_>) =
+        let count = ref stream.Current
         Button.create text
-        |>! Button.onClick writer.Write
+        |>! Button.onClick (fun () ->
+                incr count
+                stream.Write !count
+            )
 
     let placeHolder (reader: Reader<_>) =
         ContentControl()
@@ -110,6 +120,10 @@ module Controls =
     let label (reader: Reader<_>) =
         Label()
         |>! fun lbl -> reader.Add lbl.set_Content
+
+    let image (reader: Reader<_>) =
+        Image()
+        |>! fun img -> reader.Add img.set_Source
 
 module Shapes =
     open System.Windows.Shapes

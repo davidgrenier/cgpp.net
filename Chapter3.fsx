@@ -2,11 +2,6 @@
 
 open Transform.Operators
 
-module List =
-    let rec phold f acc = function
-        | [] -> acc
-        | x::xs -> phold f (f acc x xs) xs
-
 let inline mapP f min max = f min >> (*) (1.0 / (max - min))
 let inline mapxF min (x, _, z) = 1.0 - (x/z - min)
 let inline mapyF min (_, y, z) = y/z - min

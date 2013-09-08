@@ -35,13 +35,13 @@ Window.create -1e3 5e1 8e2 8e2 (fun _ ->
             C.controlPanel [
                 C.horizontalPanel [
                     C.stackPanel [
-                        Yield ()
+                        Yield 0
                         |> Run (fun _ -> printfn "test")
                         |> Render (Controls.button "Next ")
                         |>! margin
 
-                        Yield ()
-                        |> Run (fun _ -> System.Windows.MessageBox.Show "Clicked" |> ignore)
+                        Yield 0
+                        |> Run (fun x -> System.Windows.MessageBox.Show (sprintf "Clicked %i times" x) |> ignore)
                         |> Render (Controls.button "Do it ")
                         |>! margin
                     ]
@@ -55,7 +55,7 @@ Window.create -1e3 5e1 8e2 8e2 (fun _ ->
         
             Graph.create [
                 x
-                |> Stream.zip y
+                |> Stream.zipLatest y
                 |> Stream.map (fun (x, y) ->
                     [
                         x, 10.0
