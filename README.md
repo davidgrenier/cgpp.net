@@ -1,4 +1,4 @@
-## Computer Graphics: Principles and Practice, 3rd ed
+## Computer Graphics: Principles and Practice, 3<sup>rd</sup> ed
 
 This is a rough implementation of the content I have covered so far in the new edition [CGPP](http://cgpp.net/about.xml).
 
