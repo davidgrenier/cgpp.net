@@ -35,14 +35,15 @@ Window.create -1e3 5e1 8e2 8e2 (fun _ ->
             C.controlPanel [
                 C.horizontalPanel [
                     C.stackPanel [
-                        Yield 0
-                        |> Run (fun _ -> printfn "test")
-                        |> Render (Controls.button "Next ")
+                        Yield "Test"
+                        |> WithSubmit
+                        |> Run (printfn "%s")
+                        |> Render (fun _ submit -> Controls.submit "Next" submit)
                         |>! margin
 
                         Yield 0
                         |> Run (fun x -> System.Windows.MessageBox.Show (sprintf "Clicked %i times" x) |> ignore)
-                        |> Render (Controls.button "Do it ")
+                        |> Render (Controls.button "Do it")
                         |>! margin
                     ]
 

@@ -3,19 +3,22 @@
 module C = Controls
 open C.Operators
 open FSharpx
+open Piglets
 
-let poly () =
-    Polygon.create []
-    |>! Shapes.withStroke Brushes.Black
-    |>! Shapes.withMiterLimit
+Window.create -1e3 5e1 8e2 8e2 (fun _ ->
+    let clear = Yield 0
+    let points = Yield (0, 0)
 
-let window _ =
     let smoothed =
-        poly()
+        Polygon.create []
+        |>! Shapes.withMiterLimit
         |>! Shapes.withStroke Brushes.IndianRed
         |>! Shapes.withThickness 2.0
 
-    let poly = poly()
+    let poly =
+        Polygon.create []
+        |>! Shapes.withStroke Brushes.Black
+        |>! Shapes.withMiterLimit
 
     let addPoint (x, y) = Points.create x y |> poly.Points.Add
 
@@ -32,7 +35,7 @@ let window _ =
         |> poly.set_Points
 
     let ratio =
-        Slider.create 0.0 0.01 1.0
+        Slider.create 0.0 0.01 0.25
         |>! C.withWidth 1e2
         |>! Slider.withToolTip Slider.BottomRight
         |>! Slider.initTo 0.25
@@ -62,12 +65,6 @@ let window _ =
             |> Shapes.pointCollection
             |> smoothed.set_Points
 
-    let controls content =
-        content
-        |> Seq.cast<Elements.F>
-        |> Seq.iter (fun x -> x |> C.withMargins 3 0 3 3)
-        C.stackPanel content
-
     let smoothSelect, scrambleSelect, castleSelect =
         C.radioButton "Smooth" true
         , C.radioButton "Scramble" false
@@ -78,40 +75,28 @@ let window _ =
         | true, _ -> subdivide smooth
         | _, true -> subdivide scramble
         | _ -> subdivide castle
-        
-    C.dockPanel [
-        C.menu [
-            C.menuItem "File" [
-                C.menuItem "Exit" []
-            ]
-        ]
-        |>! C.dock Dock.Top
 
-        C.controlPanel [
-            ratio
-
-            smoothSelect
-            scrambleSelect
-            castleSelect
-
-            Button.create "Clear"
-            |>! Button.onClick clearPoints
-            Button.create "Subdivide"
-            |>! Button.onClick subdivide
-            Button.create "Dualize"
-            |>! Button.onClick dualize
-        ]
-        |>! C.dock Dock.Left
-        |>! C.withBackground (Colors.fromCode 0xECE9D8)
-        
+    let canvas =
         Canvas.create [
             poly
             smoothed
         ]
         |>! Controls.withBackground Colors.Transparent
         |>! Canvas.onClick addPoint
-    ]
 
-window
-|> Window.create -1e3 5e1 8e2 8e2
+    C.controlPanel [
+        ratio
+
+        smoothSelect
+        scrambleSelect
+        castleSelect
+
+        Button.create "Clear"
+        |>! Button.onClick clearPoints
+        Button.create "Subdivide"
+        |>! Button.onClick subdivide
+        Button.create "Dualize"
+        |>! Button.onClick dualize
+    ] -- canvas
+)
 |> Window.show
