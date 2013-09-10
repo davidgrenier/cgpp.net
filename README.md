@@ -1,13 +1,13 @@
-## Computer Graphics: Principles and Practice, 3<sup>rd</sup> ed
+### Computer Graphics: Principles and Practice, 3<sup>rd</sup> ed
 
-This is a rough implementation of the content I have covered so far in the new edition [CGPP](http://cgpp.net/about.xml).
+This is a rough implementation of the content I have covered so far in the new edition of [CGPP](http://cgpp.net/about.xml).
 
-### Contact
+#### Contact
 
 * Email   : davidgrenier@gmail.com
 * Google+ : https://plus.google.com/115758654847274583119
 
-### Attributions
+#### Attributions
 
 Dependencies through NuGet package restore on the following libraries:
 
