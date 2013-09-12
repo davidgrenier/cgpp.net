@@ -37,12 +37,12 @@ Window.create -1e3 5e1 8e2 8e2 (fun _ ->
                     C.stackPanel [
                         Yield "Test"
                         |> WithSubmit
-                        |> Run (printfn "%s")
+                        |> Run (System.Windows.MessageBox.Show >> ignore)
                         |> Render (fun _ submit -> Controls.submit "Next" submit)
                         |>! margin
 
                         Yield 0
-                        |> Run (fun x -> System.Windows.MessageBox.Show (sprintf "Clicked %i times" x) |> ignore)
+                        |> Run (fun x -> printfn "Clicked %i times" x)
                         |> Render (Controls.button "Do it")
                         |>! margin
                     ]
@@ -56,8 +56,8 @@ Window.create -1e3 5e1 8e2 8e2 (fun _ ->
         
             Graph.create [
                 x
-                |> Stream.zipLatest y
-                |> Stream.map (fun (x, y) ->
+                |> Reader.zipLatest y
+                |> Reader.map (fun (x, y) ->
                     [
                         x, 10.0
                         10.0, y

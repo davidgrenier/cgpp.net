@@ -1,7 +1,7 @@
 ﻿[<AutoOpen>]
 module Primitives
 
-let (|>!) e f = f e; e
+let inline (|>!) e f = f e; e
 
 [<Measure>]
 type mm
