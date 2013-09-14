@@ -1,8 +1,8 @@
 ﻿module Piglets
 
-open FSharpx
-open System.Reactive.Linq
 open System.Reactive.Subjects
+open System.Reactive.Linq
+open FSharpx.Prelude
 open System
 
 type Writer<'a> = IObserver<'a>
@@ -11,19 +11,26 @@ type System.IObserver<'a> with
     member x.Write v = x.OnNext v
 
 module Reader =
+    module Observable = FSharp.Control.Observable
     type T<'a> = System.IObservable<'a>
 
-    let map = Observable.map
-    let scan f acc (reader: T<_>) = reader.Scan(acc, fun a b -> f a b)
-    
-    let zip (reader2: T<_>) (reader1: T<_>) = reader1.Zip(reader2, fun a b -> a, b)
-    let zipWithSeq (xs: _ seq) reader = Observable.Zip(reader, xs, fun a b -> a, b)
-    let zipLatest (reader2: T<_>) (reader1: T<_>) = reader1.CombineLatest(reader2, fun a b -> a, b)
-
-    let merge (reader2: T<_>) (reader1: T<_>) = reader1.Merge reader2
+    let add = Observable.add
     let pairwise = Observable.pairwise
     let filter = Observable.filter
     let choose = Observable.choose
+    let map = Observable.map
+    let mapi = Observable.mapi
+    let scan = Observable.scan
+    let zip x = flip Observable.zip x
+    let zipLatest x = flip Observable.combineLatest x
+    let take (n: int) reader = Observable.Take(reader, n)
+    let head = Observable.FirstAsync
+    let bind (f: 'a -> T<'b>) (reader: T<'a>) = Observable.SelectMany(reader, f)
+
+    let zipWithSeq (xs: _ seq) reader = Observable.Zip(reader, xs, fun a b -> a, b)
+    let merge (reader2: T<_>) (reader1: T<_>) = reader1.Merge reader2
+
+    let wireInto f (writer: Writer<_>) (reader: T<_>) = reader.Add (f >> writer.Write)
 
 module Stream =
     type T<'a> = ISubject<'a>
@@ -130,18 +137,18 @@ module Controls =
             rb.Checked.Add(fun _ -> stream.Write true)
             rb.Unchecked.Add(fun _ -> stream.Write false)
 
-    let slider min increment max (stream: Writer<_>) =
+    let slider min increment max (value: Stream.T<_>) =
         Slider.create min increment max
         |>! fun slider ->
-            slider.ValueChanged.Add (fun e -> stream.Write e.NewValue)
+            value |> Reader.head |> Reader.add slider.set_Value
+            slider.ValueChanged.Add (fun e -> value.Write e.NewValue)
 
-    let button text (stream: Writer<_>) =
-        let count = ref 1
+    let button text (counted: Writer<_>) =
         Button.create text
-        |>! Button.onClick (fun () ->
-            stream.Write !count
-            incr count
-        )
+        |>! fun b ->
+            b.Click
+            |> Reader.mapi (fun i _ -> i + 1)
+            |> Reader.add counted.Write
 
     let submit text (submit: Writer<_>) =
         Button.create text

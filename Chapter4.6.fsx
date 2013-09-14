@@ -5,7 +5,6 @@ open C.Operators
 open FSharpx
 open Piglets
 
-Window.create -1e3 5e1 8e2 8e2 (fun _ ->
 //    let smoothed =
 //        Polygon.create []
 //        |>! Shapes.withMiterLimit
@@ -62,28 +61,41 @@ Window.create -1e3 5e1 8e2 8e2 (fun _ ->
 //        match smoothSelect.IsChecked.Value with
 //        | true -> subdivide smooth
 //        | _ -> subdivide scramble
-    
-    YieldEmpty
-    |> WithSubmit
-    |> Render (fun point clear ->
-        C.controlPanel [
-            Controls.submit "Clear" clear
-        ]
+
+Window.create -1e3 5e1 8e2 8e2 (fun _ ->
+    let point = Stream.empty
+    let ratio = Stream.create 0.0
+    let clear = Stream.create 0
+
+    C.controlPanel [
+        Controls.button "Clear" clear
+
+        Controls.slider 0.0 0.01 1.0 ratio
+        |>! C.withWidth 1e2
+        |>! Slider.withToolTip Slider.BottomRight
+        |>! Slider.initTo 0.25
+    ]
+    -< [
+        Controls.canvas point
         -< [
-            Controls.canvas point
-            -< [
-                point
-                |> Reader.scan (fun ps p -> p :: ps) []
-                |> Shapes.polygon
-                |>! Shapes.withStroke Brushes.Black
-                |>! Shapes.withMiterLimit
-            ]
-            |>! Controls.withBackground Colors.Transparent
+            point
+            |> Reader.map Some
+            |> Reader.merge (clear |> Reader.map (konst None))
+            |> Reader.scan (fun ps p ->
+                match p with
+                | None -> []
+                | Some p -> p :: ps
+            ) []
+            |> Shapes.polygon
+            |>! Shapes.withStroke Brushes.Black
+            |>! Shapes.withMiterLimit
         ]
-    )
+        |>! Controls.withBackground Colors.Transparent
+    ]
+)
+|> Window.show
         
 //    C.controlPanel [
-//        ratio
 //
 //        smoothSelect
 //        scrambleSelect
@@ -95,5 +107,3 @@ Window.create -1e3 5e1 8e2 8e2 (fun _ ->
 //        Button.create "Dualize"
 //        |>! Button.onClick dualize
 //    ] -- (canvas -- smoothed)
-)
-|> Window.show
