@@ -71,7 +71,7 @@ let vertexCircle (x, y) =
 let drawModel f =
     let points, edges = f()
 
-    Window.create -1e3 5e1 8e2 8e2 (fun _ ->
+    Window.create 8e1 5e1 8e2 8e2 (fun _ ->
         Canvas.create [
             for p, q in edges ->
                 (mapPoint p, mapPoint q)
@@ -155,7 +155,7 @@ module Ex3_3 =
                     :> _
                 yield! face |> Seq.map vertexCircle
         ]
-    |> Window.create -1e3 5e1 8e2 8e2
+    |> Window.create 8e1 5e1 8e2 8e2
     |> Window.show
 
 module Ex3_4 =
@@ -186,5 +186,5 @@ module Ex3_4 =
             for p, _ in edges ->
                 vertexCircle (mapPoint p)
         ]
-    |> Window.create -1e3 5e1 8e2 8e2
+    |> Window.create 8e1 5e1 8e2 8e2
     |> Window.show

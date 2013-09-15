@@ -38,22 +38,24 @@ let canvas candidates =
         let b = fromMili (sqrt 2.0 * 1.0<_>)
         let w, h = c.ActualWidth / b, c.ActualWidth / b
 
-        [
-            let f = 18.0
-            for x in [f..f..w] @ [0.0 .. -f .. -w] do
-            for y in [f..f..h] @ [0.0 .. -f .. -h] do
-                if (x, y) <> (0.0, 0.0) then
-                    yield x, y
-        ]
-        |> List.collect (fun (x, y) ->
-            let line a b = Shapes.line a b |>! Shapes.withStroke Brushes.Navy |>! Shapes.withThickness 0.6
-            let f = 3.5
+        c -< (
             [
-                line (x - f, y) (x + f, y)
-                line (x, y - f) (x, y + f)
+                let f = 18.0
+                for x in [f..f..w] @ [0.0 .. -f .. -w] do
+                for y in [f..f..h] @ [0.0 .. -f .. -h] do
+                    if (x, y) <> (0.0, 0.0) then
+                        yield x, y
             ]
+            |> List.collect (fun (x, y) ->
+                let line a b = Shapes.line a b |>! Shapes.withStroke Brushes.Navy |>! Shapes.withThickness 0.6
+                let f = 3.5
+                [
+                    line (x - f, y) (x + f, y)
+                    line (x, y - f) (x, y + f)
+                ]
+            )
         )
-        |> flip C.addChildren c
+        |> ignore
     )
     |>! Elements.onLoad (fun c ->
         c -+ Transform.translate (c.ActualWidth / 2.0) (c.ActualHeight / 2.0)        
@@ -68,7 +70,7 @@ let slider max ticksAt =
     |>! Slider.withToolTip Slider.BottomRight
     |>! Slider.withTick Slider.BottomRight
 
-Window.create -1e3 5e1 8e2 8e2 (fun w ->
+Window.create 8e1 5e1 8e2 8e2 (fun w ->
     let canvas = canvas (candidates())
     C.controlPanel [
         slider 20.0 2.0

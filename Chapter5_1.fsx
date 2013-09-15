@@ -4,7 +4,7 @@ open Transform.Operators
 module C = Controls
 open C.Operators
 
-Window.create -1e3 5e1 8e2 8e2 (fun _ ->
+Window.create 8e1 5e1 8e2 8e2 (fun _ ->
     let gray =
         Polygon.create [
             8e1, 0.0

@@ -16,17 +16,17 @@ let caroussel =
     |> Seq.map (fun x -> System.Windows.Media.Imaging.BitmapImage(System.Uri x))
     |> Seq.repeat
 
-Window.create -1e3 5e1 8e2 6e2 (fun _ ->
-    Yield 0
-    |> Render (fun index ->
+Window.create 8e1 5e1 8e2 6e2 (fun _ ->
+    Yield None
+    |> Render (fun clicked ->
         let image =
-            index
+            clicked
             |> Reader.zipWithSeq caroussel
             |> Reader.map snd
             |> Controls.image
 
         C.controlPanel [
-            Controls.button "Change" index
+            Controls.button "Change" clicked
             |>! C.withMargins 3 0 3 3
         ] -- image
     )

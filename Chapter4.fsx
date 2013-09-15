@@ -2,11 +2,12 @@
 
 module C = Controls
 open C.Operators
+open FSharpx
 open Piglets
 
 let margin x = C.withMargins 3 0 3 3 x
 
-Window.create -1e3 5e1 8e2 8e2 (fun _ ->
+Window.create 8e1 5e1 8e2 8e2 (fun _ ->
     let skewer =
         Return (fun x y -> x, y)
         <*> Yield 0.0
@@ -40,9 +41,13 @@ Window.create -1e3 5e1 8e2 8e2 (fun _ ->
                         |> Run (System.Windows.MessageBox.Show >> ignore)
                         |> Render (fun _ submit -> Controls.submit "Next" submit)
                         |>! margin
-
-                        Yield 0
-                        |> Run (fun x -> printfn "Clicked %i times" x)
+                        
+                        Yield None
+                        |>! fun clicked ->
+                            clicked
+                            |> mapi (fun i _ -> i + 1)
+                            |> Run (printfn "Clicked %i times")
+                            |> ignore
                         |> Render (Controls.button "Do it")
                         |>! margin
                     ]
@@ -66,7 +71,6 @@ Window.create -1e3 5e1 8e2 8e2 (fun _ ->
                     ]
                 )
                 |> Shapes.polygon
-                |>! Shapes.withStroke Brushes.Black
                 |>! Shapes.withFill Brushes.LightSeaGreen
             
                 Shapes.dot 1.5 Brushes.LightPink

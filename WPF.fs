@@ -112,23 +112,18 @@ module Shapes =
 module Controls =
     open System.Windows.Controls
 
-    let inline childrenProp arg = (^a : (member Children : UIElementCollection) arg)
-    let inline itemsProp arg = (^a : (member Items : ItemCollection) arg)
     let inline withBackground color e = (^a : (member set_Background : Brush -> unit) (e, SolidColorBrush color))
     let inline withImage source e = (^a : (member set_Background : Brush -> unit) (e, System.Windows.Media.ImageBrush source))
 
-    let inline addItems items element =
-        let itemCollection = itemsProp element
-        items |> Seq.iter (itemCollection.Add >> ignore)
-
-    let inline addChildren (children: #Elements.T list) element =
-        let childrenCollection = childrenProp element
-        children |> Seq.iter (childrenCollection.Add >> ignore)
+    let addItems items (element: #ItemsControl) =
+        items |> Seq.iter (element.Items.Add >> ignore)
 
     [<AutoOpen>]
     module Operators =
-        let inline (-<) element children = addChildren children element; element
-        let inline (--) element child = element -< [child]
+        let (-<) (element: #Panel) =
+            Seq.iter (element.Children.Add >> ignore)
+            >> konst element
+        let (--) element child = element -< [child]
 
     let stackPanel (elements: Elements.T list) =
         StackPanel() -< elements
@@ -310,7 +305,7 @@ module Graph =
         |>! Elements.onLoad (fun c ->
             let w, h = c.ActualWidth / fromMili 2.0<mm>, c.ActualHeight / fromMili 2.0<mm>
             
-            c |> addChildren [
+            c -< [
                 let gridLine a b =
                     Shapes.line a b
                     |>! Shapes.withStroke Brushes.LightBlue
@@ -319,6 +314,7 @@ module Graph =
                 for x in [0.0..(-1e1)..(-w)] @ [1e1..1e1..w] -> gridLine (x, -h) (x, h)
                 for y in [0.0..(-1e1)..(-h)] @ [1e1..1e1..h] -> gridLine (-w, y) (w, y)
             ]
+            |> ignore
         )
         |>! Elements.onLoad (fun c ->
             let w, h = c.ActualWidth / 2.0, c.ActualHeight / 2.0
@@ -331,10 +327,11 @@ module Graph =
         |> Elements.onLoad (fun c ->
             let w, h = c.ActualWidth / fromMili 2.0<mm>, c.ActualHeight / fromMili 2.0<mm>
 
-            c |> addChildren [
+            c -< [
                 Polygon.arrow (0.0, -2e1) (0.0, 0.9 * h) Brushes.Black
                 Polygon.arrow (-2e1, 0.0) (0.9 * w, 0.0) Brushes.Black
             ]
+            |> ignore
         )
 
 module Timespan =

@@ -25,7 +25,7 @@ let points level =
     let n = 1 <<< level
     Seq.init (n * n) (point n)
 
-Window.create -1e3 5e1 8e2 68e1 (fun _ ->
+Window.create 8e1 5e1 8e2 68e1 (fun _ ->
     let margin = fromInch 0.25<inch>
 
     let curve =

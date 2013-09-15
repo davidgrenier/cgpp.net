@@ -7,7 +7,7 @@ open FSharpx
 
 type Visibility = System.Windows.Visibility
 
-Window.create -1e3 5e1 8e2 8e2 (fun _ ->
+Window.create 8e1 5e1 8e2 8e2 (fun _ ->
     let dot() = Shapes.dot 1.0 Brushes.Black
     let set1 =
         Canvas.create [

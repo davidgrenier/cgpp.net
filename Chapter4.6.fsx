@@ -5,12 +5,6 @@ open C.Operators
 open FSharpx
 open Piglets
 
-//    let smoothed =
-//        Polygon.create []
-//        |>! Shapes.withMiterLimit
-//        |>! Shapes.withStroke Brushes.IndianRed
-//        |>! Shapes.withThickness 2.0
-
 //    let clearPoints () =
 //        poly.Points.Clear()
 //        smoothed.Points.Clear()
@@ -29,8 +23,6 @@ open Piglets
 //        |>! Slider.withToolTip Slider.BottomRight
 //        |>! Slider.initTo 0.25
 //
-//    let (!) a b = ratio.Value * a + (1.0 - ratio.Value) * b
-//    let smooth ((x1, y1), (x2, y2)) = !x1 x2, !y1 y2
 //    let scramble ((x1, y1), (x2, y2)) = !x2 x1, !y1 y2
 //
 //    let subdivide style =
@@ -46,12 +38,6 @@ open Piglets
 //        | points ->
 //            let points = List.map Points.coords points
 //
-//            points.Tail @ [points.Head]
-//            |> Seq.zip3 (List.last points :: List.dropLast points) points
-//            |> Seq.collect (fun (prev, cur, next) -> [prev, cur; next, cur])
-//            |> Seq.map style
-//            |> Shapes.pointCollection
-//            |> smoothed.set_Points
 //
 //    let smoothSelect, scrambleSelect =
 //        C.radioButton "Smooth" true
@@ -62,48 +48,70 @@ open Piglets
 //        | true -> subdivide smooth
 //        | _ -> subdivide scramble
 
-Window.create -1e3 5e1 8e2 8e2 (fun _ ->
+Window.create 8e1 5e1 8e2 8e2 (fun _ ->
     let point = Stream.empty
-    let ratio = Stream.create 0.0
-    let clear = Stream.create 0
-
+    let ratio = Stream.create 0.25
+    let clear = Stream.create None
+    let subdivide = Stream.empty
+    
     C.controlPanel [
         Controls.button "Clear" clear
+        Controls.button "Subdivide" subdivide
 
         Controls.slider 0.0 0.01 1.0 ratio
         |>! C.withWidth 1e2
         |>! Slider.withToolTip Slider.BottomRight
-        |>! Slider.initTo 0.25
-    ]
-    -< [
-        Controls.canvas point
-        -< [
+    ] -- (
+        let points =
             point
             |> Reader.map Some
-            |> Reader.merge (clear |> Reader.map (konst None))
-            |> Reader.scan (fun ps p ->
-                match p with
+            |> Reader.merge clear
+            |> Reader.scan (fun ps ->
+                function
                 | None -> []
                 | Some p -> p :: ps
             ) []
+            |> Stream.ofReader
+
+        let subDivideFor points ratio n =
+            let (!) a b = ratio * a + (1.0 - ratio) * b
+            let smooth (x1, y1) (x2, y2) = !x1 x2, !y1 y2
+
+            let rec subdivide points depth =
+                match depth, Seq.toList points with
+                | 0, _ | _, [] -> points
+                | n, ps ->
+                    ps.Tail @ [ps.Head]
+                    |> Seq.zip3 (List.last ps :: List.dropLast ps) ps
+                    |> Seq.collect (fun (prev, cur, next) -> [smooth prev cur; smooth next cur])
+                    |> flip subdivide (n - 1)
+
+            subdivide points n
+
+        Controls.canvas point
+        -< [
+            Shapes.polygon points
+            
+            
+            Reader.mapi (fun i _ -> i % 5 + 1) subdivide
+            |> Reader.merge (Reader.tail clear |> Reader.map (konst 0))
+            |> Reader.bind (fun depth ->
+                Reader.head points
+                |> Reader.zipLatest ratio
+                |> Reader.map (fun (points, ratio) -> subDivideFor points ratio depth)
+            )
             |> Shapes.polygon
-            |>! Shapes.withStroke Brushes.Black
-            |>! Shapes.withMiterLimit
+            |>! Shapes.withStroke Brushes.IndianRed
+            |>! Shapes.withThickness 2.0
         ]
-        |>! Controls.withBackground Colors.Transparent
-    ]
+    )
 )
 |> Window.show
         
 //    C.controlPanel [
-//
 //        smoothSelect
 //        scrambleSelect
 //
-//        Button.create "Clear"
-//        |>! Button.onClick clearPoints
-//        Button.create "Subdivide"
-//        |>! Button.onClick subdivide
 //        Button.create "Dualize"
 //        |>! Button.onClick dualize
 //    ] -- (canvas -- smoothed)

@@ -65,7 +65,7 @@ let accurateClock () =
         (float System.DateTime.Now.Minute * 6.0)
         (float System.DateTime.Now.Hour * 3e1)
 
-Window.create -1e3 50.0 8e2 8e2 (fun _ ->
+Window.create 8e1 50.0 8e2 8e2 (fun _ ->
     Return (fun fast accurate -> fast, accurate)
     <*> Yield true
     <*> Yield false
@@ -76,9 +76,8 @@ Window.create -1e3 50.0 8e2 8e2 (fun _ ->
                 C.radio "Accurate" accurate
             ]
 
-            fast
-            |> Stream.map (function true -> fastClock() | _ -> accurateClock())
-            |> C.placeHolder
+            Content.empty
+            |> Content.show fast (function true -> fastClock() | _ -> accurateClock())
         ]
     )
 )

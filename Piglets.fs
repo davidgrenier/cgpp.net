@@ -7,7 +7,7 @@ open System
 
 type Writer<'a> = IObserver<'a>
 
-type System.IObserver<'a> with
+type IObserver<'a> with
     member x.Write v = x.OnNext v
 
 module Reader =
@@ -25,34 +25,41 @@ module Reader =
     let zipLatest x = flip Observable.combineLatest x
     let take (n: int) reader = Observable.Take(reader, n)
     let head = Observable.FirstAsync
+
     let bind (f: 'a -> T<'b>) (reader: T<'a>) = Observable.SelectMany(reader, f)
+    let distinctUntilChanged = Observable.DistinctUntilChanged
+    let tail reader = Observable.Skip(reader, 1)
+    let append second first = Observable.Concat(first, second)
+
+    let Do f (reader: T<_>) = reader.Do(fun x -> f x)
 
     let zipWithSeq (xs: _ seq) reader = Observable.Zip(reader, xs, fun a b -> a, b)
     let merge (reader2: T<_>) (reader1: T<_>) = reader1.Merge reader2
 
-    let wireInto f (writer: Writer<_>) (reader: T<_>) = reader.Add (f >> writer.Write)
-
+    let into (writer: Writer<_>) f (reader: T<_>) = reader.Add (f >> writer.Write)
+    
 module Stream =
     type T<'a> = ISubject<'a>
 
     let create x = new BehaviorSubject<_>(x)
 
-    let empty<'a> : T<'a> =
-        let sub = create None
+    let empty<'a> =
+        let subject = create None
         {
             new T<'a>
                 interface IObserver<'a> with
-                    member x.OnNext v = sub.OnNext (Some v)
-                    member x.OnError e = sub.OnError e
-                    member x.OnCompleted() = sub.OnCompleted()
+                    member x.OnNext v = subject.Write (Some v)
+                    member x.OnError e = subject.OnError e
+                    member x.OnCompleted() = subject.OnCompleted()
                 interface Reader.T<'a> with
-                    member x.Subscribe obs = sub.Subscribe (Option.iter obs.OnNext)
+                    member x.Subscribe writer = subject.Subscribe (Option.iter writer.Write)
         }
 
     let ofReader (reader: Reader.T<_>) =
-        empty |>! fun s -> reader.Add s.Write
+        empty |>! fun s -> reader |> Reader.into s id
 
     let map f stream = Reader.map f stream |> ofReader
+    let mapi f stream = Reader.mapi f stream |> ofReader
 
 type Piglet<'a, 'v> =
     {
@@ -96,17 +103,13 @@ let (<*>) pig1 pig2 =
 let Render f piglet = piglet.ViewBuilder f
 
 let WithSubmit piglet =
-    let submit = YieldEmpty<unit, _>
-    let s =
-        piglet.Stream
-        |> Reader.map Some
-        |> Reader.merge(submit.Stream |> Reader.map (konst None))
-        |> Reader.pairwise
-        |> Reader.choose (function a, None -> a | _ -> None)
-        |> Stream.ofReader
+    let submit = YieldEmpty
+    let clicked =
+        submit.Stream
+        |> Reader.bind (fun _ -> Reader.head piglet.Stream)
 
     {
-        Stream = s
+        Stream = Stream.ofReader clicked
         ViewBuilder = piglet.ViewBuilder >> submit.ViewBuilder
     }
 
@@ -115,9 +118,23 @@ let Run f piglet =
     piglet
 
 let map f pig =
-    pig.Stream
-    |> Stream.map f
+    Stream.map f pig.Stream
     |> yeld
+
+let mapi f pig =
+    Stream.mapi f pig.Stream
+    |> yeld
+
+module Content =
+    open System.Windows.Controls
+
+    let empty<'a> = ContentControl()
+
+    let label() = Label()
+    
+    let show (reader: Reader.T<_>) f (content: #ContentControl) =
+        reader.Add (f >> content.set_Content)
+        content
 
 module Controls =
     open System.Windows.Controls
@@ -128,43 +145,42 @@ module Controls =
         TextBox()
         |>! fun tb ->
             stream.Add tb.set_Text
-            tb.TextChanged.Add(fun _ -> stream.Write tb.Text)
+            tb.TextChanged
+            |> Reader.into stream (fun _ -> tb.Text)
 
     let radio text (stream: Stream.T<_>) =
         RadioButton(Content = text)
         |>! fun rb ->
             stream.Add (fun isChecked -> rb.IsChecked <- System.Nullable isChecked)
-            rb.Checked.Add(fun _ -> stream.Write true)
-            rb.Unchecked.Add(fun _ -> stream.Write false)
+            rb.Checked
+            |> Reader.into stream (konst true)
+            rb.Unchecked
+            |> Reader.into stream (konst false)
 
-    let slider min increment max (value: Stream.T<_>) =
+    let slider min increment max value =
         Slider.create min increment max
         |>! fun slider ->
-            value |> Reader.head |> Reader.add slider.set_Value
-            slider.ValueChanged.Add (fun e -> value.Write e.NewValue)
+            Reader.head value
+            |> Reader.add slider.set_Value
 
-    let button text (counted: Writer<_>) =
+            slider.ValueChanged
+            |> Reader.into value (fun e -> e.NewValue)
+
+    let button text clicked =
         Button.create text
         |>! fun b ->
             b.Click
-            |> Reader.mapi (fun i _ -> i + 1)
-            |> Reader.add counted.Write
+            |> Reader.into clicked (konst None)
 
-    let submit text (submit: Writer<_>) =
+    let submit text submit =
         Button.create text
-        |>! Button.onClick submit.Write
-
-    let placeHolder (reader: Reader.T<_>) =
-        ContentControl()
-        |>! fun content -> reader.Add content.set_Content
-
+        |>! fun b ->
+            b.Click
+            |> Reader.into submit ignore
+        
     let textBlock (reader: Reader.T<_>) =
         TextBlock()
         |>! fun tb -> reader.Add tb.set_Text
-
-    let label (reader: Reader.T<_>) =
-        Label()
-        |>! fun lbl -> reader.Add lbl.set_Content
 
     let image (reader: Reader.T<_>) =
         Image()
@@ -173,6 +189,7 @@ module Controls =
     let canvas (points: Writer<_>) =
         Canvas.T()
         |>! Canvas.onClick points.Write
+        |>! Controls.withBackground Colors.Transparent
         
 
 module Shapes =
@@ -181,3 +198,5 @@ module Shapes =
     let polygon (reader: Reader.T<_>) =
         Polygon()
         |>! fun p -> reader.Add (Shapes.pointCollection >> p.set_Points)
+        |>! Shapes.withStroke Brushes.Black
+        |>! Shapes.withMiterLimit
