@@ -125,10 +125,12 @@ module Controls =
             >> konst element
         let (--) element child = element -< [child]
 
-    let stackPanel (elements: Elements.T list) =
+    let stackPanel elements =
         StackPanel() -< elements
 
-    let horizontalPanel = stackPanel >> fun x -> x.Orientation <- Orientation.Horizontal; x
+    let horizontalPanel elements =
+        StackPanel(Orientation = Orientation.Horizontal)
+        -< elements
 
     let content content = ContentControl(Content = content)
 

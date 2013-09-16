@@ -2,7 +2,7 @@
 
 open Piglets
 module C = Controls
-
+open C.Operators
 open System.Windows.Media
 open Transform.Operators
 
@@ -66,19 +66,16 @@ let accurateClock () =
         (float System.DateTime.Now.Hour * 3e1)
 
 Window.create 8e1 50.0 8e2 8e2 (fun _ ->
-    Return (fun fast accurate -> fast, accurate)
-    <*> Yield true
-    <*> Yield false
-    |> Render (fun fast accurate ->
+    Yield fastClock
+    |> Render (fun clockKind ->
         C.stackPanel [
-            C.horizontalPanel [
-                C.radio "Fast" fast
-                C.radio "Accurate" accurate
+            C.radio clockKind [
+                "Fast", fastClock
+                "Accurate", accurateClock
             ]
-
-            Content.empty
-            |> Content.show fast (function true -> fastClock() | _ -> accurateClock())
+            |> C.stackPanel
         ]
+        -- Content.show clockKind (fun f -> f()) Content.empty
     )
 )
 |> Window.show

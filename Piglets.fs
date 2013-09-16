@@ -25,6 +25,7 @@ module Reader =
     let zipLatest x = flip Observable.combineLatest x
     let take (n: int) reader = Observable.Take(reader, n)
     let head = Observable.FirstAsync
+    let startWith v (reader: T<_>) = Observable.StartWith(reader, [v])
 
     let bind (f: 'a -> T<'b>) (reader: T<'a>) = Observable.SelectMany(reader, f)
     let distinctUntilChanged = Observable.DistinctUntilChanged
@@ -148,14 +149,17 @@ module Controls =
             tb.TextChanged
             |> Reader.into stream (fun _ -> tb.Text)
 
-    let radio text (stream: Stream.T<_>) =
-        RadioButton(Content = text)
-        |>! fun rb ->
-            stream.Add (fun isChecked -> rb.IsChecked <- System.Nullable isChecked)
-            rb.Checked
-            |> Reader.into stream (konst true)
-            rb.Unchecked
-            |> Reader.into stream (konst false)
+    let radio (writer: Writer<_>) =
+        Seq.mapi (fun i (label, value) ->
+            RadioButton(Content = label)
+            |>! fun rb ->
+                if i = 0 then
+                    rb.IsChecked <- System.Nullable true
+                    writer.Write value
+
+                rb.Checked
+                |> Reader.into writer (konst value)
+        )
 
     let slider min increment max value =
         Slider.create min increment max
@@ -166,11 +170,11 @@ module Controls =
             slider.ValueChanged
             |> Reader.into value (fun e -> e.NewValue)
 
-    let button text clicked =
+    let button text value clicks =
         Button.create text
         |>! fun b ->
             b.Click
-            |> Reader.into clicked (konst None)
+            |> Reader.into clicks (konst value)
 
     let submit text submit =
         Button.create text
