@@ -26,7 +26,7 @@ Window.create 8e1 5e1 8e2 6e2 (fun _ ->
             |> Controls.image
 
         C.controlPanel [
-            Controls.button "Change" clicked
+            Controls.button "Change" None clicked
             |>! C.withMargins 3 0 3 3
         ] -- image
     )
