@@ -34,16 +34,14 @@ type Action =
 Window.create 8e1 5e1 8e2 8e2 (fun _ ->
     let point = Stream.empty
     let ratio = Stream.create 0.25
-    let subdivide = Stream.empty
+    let depth = Stream.empty
     let adjuster = Stream.empty
-    let act = Stream.create Clear
-    let acts =
-        point
-        |> Reader.map AddPoint
-        |> Reader.merge act
+    let clearDual = Stream.create Clear
     
     let points =
-        acts
+        point
+        |> Reader.map AddPoint
+        |> Reader.merge clearDual
         |> Reader.scan (fun ps ->
             function
             | Clear -> []
@@ -53,14 +51,10 @@ Window.create 8e1 5e1 8e2 8e2 (fun _ ->
         |> Stream.ofReader
 
     let subdivided =
-        subdivide
-        |> Reader.mapi (fun i () -> i % 7 + 1)
-        |> Reader.zipLatest acts
-        |> Reader.bind (fun (depth, act) ->
-            let depth =
-                match act with
-                | Clear -> 0
-                | _ -> depth
+        depth
+        |> Reader.map int
+        |> Reader.merge (clearDual |> Reader.map (konst 0))
+        |> Reader.bind (fun depth ->
             Reader.head points
             |> Reader.zipLatest ratio
             |> Reader.zipLatest adjuster
@@ -71,8 +65,8 @@ Window.create 8e1 5e1 8e2 8e2 (fun _ ->
         )
     
     C.controlPanel [
-        Controls.button "Clear" Clear act
-        Controls.button "Dualize" Dualize act
+        Controls.button "Clear" Clear clearDual
+        Controls.button "Dualize" Dualize clearDual
 
         Controls.radio adjuster [
             "Smooth", smooth
@@ -83,10 +77,15 @@ Window.create 8e1 5e1 8e2 8e2 (fun _ ->
         Controls.slider 0.0 0.01 1.0 ratio
         |>! C.withWidth 1e2
         |>! Slider.withToolTip Slider.BottomRight
+        |> C.withLabel "Ratio"
 
-        Controls.button "Subdivide" () subdivide
+        Controls.slider 1.0 1.0 9.0 depth
+        |>! C.withWidth 1e2
+        |>! Slider.withToolTip Slider.BottomRight
+        |>! Slider.withTick Slider.BottomRight
+        |>! Slider.snaps
+        |> C.withLabel "Depth"
     ] -- (
-
         Controls.canvas point
         -< [
             Shapes.polygon points
