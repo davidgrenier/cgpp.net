@@ -5,7 +5,7 @@
 #r "UIAutomationTypes"
 #r "System.Runtime"
 
-#I @"C:\Bib\Projects\cgpp.net\packages\"
+#I @"C:\Projects\cgpp.net\packages\"
 #r @"FSharpx.Core.1.8.38\lib\40\FSharpx.Core.dll"
 #r @"Extended.Wpf.Toolkit.2.0.0\lib\net40\Xceed.Wpf.Toolkit.dll"
 #r @"Rx-Interfaces.2.1.30214.0\lib\Net45\System.Reactive.Interfaces.dll"
@@ -13,6 +13,7 @@
 #r @"Rx-PlatformServices.2.1.30214.0\lib\Net45\System.Reactive.PlatformServices.dll"
 #r @"Rx-Linq.2.1.30214.0\lib\Net45\System.Reactive.Linq.dll"
 #r @"Rx-XAML.2.1.30214.0\lib\Net45\System.Reactive.Windows.Threading.dll"
+#r "System.Threading.Tasks"
 
 #load "Primitives.fs"
 #load "Collections.fs"

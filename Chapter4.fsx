@@ -48,7 +48,7 @@ Window.create 8e1 5e1 8e2 8e2 (fun _ ->
                             |> mapi (fun i _ -> i + 1)
                             |> Run (printfn "Clicked %i times")
                             |> ignore
-                        |> Render (Controls.button "Do it" 0)
+                        |> Render (Controls.button "Do it" (Some 0))
                         |>! margin
                     ]
 
