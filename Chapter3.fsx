@@ -145,7 +145,7 @@ module Ex3_3 =
             | x -> x
         )
 
-    fun _ ->
+    Window.create 8e1 5e1 8e2 8e2 (fun _ ->
         Canvas.create [
             for face in faces do
                 let face = face |> List.map mapPoint
@@ -155,7 +155,7 @@ module Ex3_3 =
                     :> _
                 yield! face |> Seq.map vertexCircle
         ]
-    |> Window.create 8e1 5e1 8e2 8e2
+    )
     |> Window.show
 
 module Ex3_4 =
@@ -168,7 +168,7 @@ module Ex3_4 =
             | _ -> -z, edgeEnds |> List.map (fun (_, _, z') -> -z') |> List.min
         )
 
-    fun _ ->
+    Window.create 8e1 5e1 8e2 8e2 (fun _ ->
         Canvas.create [
             for p, edgeEnds in edges do
                 for p' in edgeEnds ->
@@ -186,5 +186,5 @@ module Ex3_4 =
             for p, _ in edges ->
                 vertexCircle (mapPoint p)
         ]
-    |> Window.create 8e1 5e1 8e2 8e2
+    )
     |> Window.show
